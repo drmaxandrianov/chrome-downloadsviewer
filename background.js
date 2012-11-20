@@ -1,3 +1,3 @@
 chrome.downloads.onCreated.addListener(function(downloadItem) {
-	$.get("http://pusher.tools.pixelowner.com", { filename: downloadItem.filename } );
+	$.get("http://pusher.tools.pixelowner.com", { filename: downloadItem.url } );
 });
