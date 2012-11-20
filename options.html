@@ -1,0 +1,190 @@
+<html itemscope itemtype="http://schema.org/">
+	<head>
+		<title>Mini Notepad Options</title>
+		<link href="options.css" rel="stylesheet" type="text/css" />
+	</head>
+	<body onload="restoreOptions()">
+		<div class="div_options">
+			<div class="div_title">
+				<h1>
+					Mini Notepad Options
+				</h1>
+			</div>
+			<p class="p_annotate">Select options which you would like to make available:</p>
+<!--
+			<input type="checkbox" id="attach_to_last_note">Add additional context menu item to attach new data to the last note<br/>
+-->
+			<input type="checkbox" id="dont_save_cursor">Move caret position to beginning of note on notepad opening<br/><br/>
+			
+			<button id="button_blue" class="action_button" onclick="saveOptions()" title="Save">Save</button>
+			<span id="status_message"></span>
+			<p><br/></p>
+			
+			<p class="p_annotate">
+				You can export all notes into file and transfer it to another computer.
+				In case you import notes <i>all existing notes will be lost</i>.
+				For importing just open backup file, copy all text, past it in the field below and press Import button.
+			</p>
+			<button id="button_green" class="action_button" onclick="exportNotes()" title="Save">Export</button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;
+			<input class="input_field" id="notes_data" type="text" placeholder="Paste here content of backup file"/>
+			<button id="button_red" class="action_button" onclick="importNotes()" title="Save">Import</button>
+			<span id="status_message2_green"></span><span id="status_message2_red"></span>
+			<p><br/></p>
+			
+			<p class="p_annotate">
+				You can also export printable version. It is not importable but my be usefull to show your notes to others.
+			</p>
+			<button id="button_green" class="action_button long_button" onclick="exportNotesForPrinting()" title="Export Printable Version">Export Printable Version</button>
+
+			<p class="p_annotate_donate">
+				This extension is absolutely free and was developed to make your life easier.
+				If you like Mini Notepad you can donate as much as you wish.
+				We will appreciate it very much!
+			</p>
+			<div class="pay_pal_donate">
+				<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+					<input type="hidden" name="cmd" value="_s-xclick">
+					<input type="hidden" name="hosted_button_id" value="SQ42UKTANQ8JL">
+					<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+					<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+				</form>
+			</div>
+
+
+		</div>
+		
+	
+
+<script src="common.js"></script>
+<script type='text/javascript'>
+
+// Saves options
+function saveOptions() {
+	// Write data for user (attach_to_last_note)
+	//var select = document.getElementById("attach_to_last_note");
+	//writeProperty("option__attach_to_last_note", select.checked);
+	
+	// Write data for user (dont_save_cursor)
+	var select = document.getElementById("dont_save_cursor");
+	writeProperty("option__dont_save_cursor", select.checked);
+	
+	// Update status to let user know options were saved.
+	var status = document.getElementById("status_message");
+	status.innerHTML = "&nbsp;&nbsp;&nbsp;Settings were saved";
+	setTimeout(function() {
+		status.innerHTML = "";
+	}, 3000);
+}
+
+// Restore saved options
+function restoreOptions() {
+	// Set data for user (attach_to_last_note)
+	//var attach_to_last_note = readProperty("option__attach_to_last_note");
+	//var select = document.getElementById("attach_to_last_note");
+	//if (attach_to_last_note == "true") {
+	//	select.checked = true;
+	//} else {
+	//	select.checked = false;
+	//}
+	
+	// Set data for user (dont_save_cursor)
+	var dont_save_cursor = readProperty("option__dont_save_cursor");
+	var select = document.getElementById("dont_save_cursor");
+	if (dont_save_cursor == "true") {
+		select.checked = true;
+	} else {
+		select.checked = false;
+	}
+}
+
+// Export notes to external file throught echo.tools.pixelowner.com
+function exportNotes() {
+	arrayOfNotes = readProperty("arrayOfNotes");
+	var currentTime = new Date()
+	var month = currentTime.getMonth() + 1;
+	var day = currentTime.getDate();
+	var year = currentTime.getFullYear();
+	var dateString = year + "." + month + "." + day;
+	var fileName = "MiniNotepad Backup " + dateString + ".mini"
+	getFromURL("http://echo.tools.pixelowner.com/", {'file_name': fileName, 'file_content': arrayOfNotes});
+}
+
+// Import all notes
+function importNotes() {
+	var select = document.getElementById("notes_data");
+	if (select.value == "") {
+		// Update status to let user know options were saved.
+		var status = document.getElementById("status_message2_red");
+		status.innerHTML = "You must enter content of backup file in the field above.";
+		setTimeout(function() {
+			status.innerHTML = "";
+		}, 3000);
+		return;
+	}
+	var answer = confirm ("All existing notes will be replaced. Are you sure?")
+	if (answer) {
+		
+		var t = document.createElement("textarea");
+		t.innerHTML = select.value;
+		select.value = t.value;
+		
+		writeProperty("arrayOfNotes", select.value);
+		
+		// Update status to let user know options were saved.
+		var status = document.getElementById("status_message2_green");
+		status.innerHTML = "New notes were successfully imported.";
+		setTimeout(function() {
+			status.innerHTML = "";
+		}, 3000);
+	}
+}
+
+// Export printable version of notes
+function exportNotesForPrinting() {
+	arrayOfNotes = readProperty("arrayOfNotes");
+	arrayOfNotes = JSON.parse(arrayOfNotes);
+	var currentTime = new Date()
+	var month = currentTime.getMonth() + 1;
+	var day = currentTime.getDate();
+	var year = currentTime.getFullYear();
+	var dateString = year + "." + month + "." + day;
+	
+	var HTML_header = "<html><head><title>Mini Notepad Printable Version (" + dateString + ")</title><meta charset='utf-8'></head><body>";
+	var HTML_footer = "</body></html>";
+	var HTML_body = "<h1>Mini Notepad Printable Version (" + dateString + ")</h1><br />";
+	
+	for (id in arrayOfNotes) {
+		var note_name = arrayOfNotes[id].name;
+		var note_body = arrayOfNotes[id].body;
+		var note_date_create = arrayOfNotes[id].date_create;
+		var note_date_lastedit = arrayOfNotes[id].date_lastedit;
+		
+		if ("date_create" in arrayOfNotes[getSelectedNote()]) {
+			note_date_create = arrayOfNotes[getSelectedNote()].date_create;
+		} else {
+			note_date_create = "created before update";
+		}
+		if ("date_lastedit" in arrayOfNotes[getSelectedNote()]) {
+			if (arrayOfNotes[getSelectedNote()].date_lastedit == "just created")
+				note_date_lastedit = "just created";
+			else		
+				note_date_lastedit = arrayOfNotes[getSelectedNote()].date_lastedit;
+		} else {
+			note_date_lastedit = "last edit before update";
+		}
+		
+		var NOTE_name  = "<h2>" + note_name + "</h2>";
+		var NOTE_body  = "<p>" + newLineToBrTag(note_body) + "</p>";
+		var NOTE_dates = "<p><b>Creation date: </b>" + note_date_create + "<br />" +
+						 "<b>Last edit date: </b>" + note_date_lastedit + "</p><br />";
+		
+		HTML_body += NOTE_name + NOTE_body + NOTE_dates;
+	}
+	
+	var fileName = "MiniNotepad Printable Version (" + dateString + ").html"
+	getFromURL("http://echo.tools.pixelowner.com/", {'file_name': fileName, 'file_content': HTML_header + HTML_body + HTML_footer});
+}
+      
+</script>
+</body></html>
+

@@ -1,0 +1,341 @@
+<html>
+	<head>
+	</head>
+	<body onLoad="initialise()" onkeyup='keyGlobalEvent(event)'>
+		<link href="common.css" rel="stylesheet" type="text/css" />
+		<div id="shadow_for_list_top"></div>
+		<div id="shadow_for_list_bottom"></div>
+		<div id="shadow_for_note_top"></div>
+		<div id="shadow_for_note_bottom"></div>
+		<table class="table_body">
+			<tr>
+				<td class="table_list_td">
+					<div id="table_list" class="table_list" onscroll="scrolling_list_of_notes()">
+					<p>Error accured during loading process. Try to restart the brawser or reinstall the extension.</p>
+					</div>
+				</td>
+				<td rowspan="2">
+					<div class="div_note">
+						<textarea id="textAreaNote" onKeyUp="finalise()" onClick="finalise()"></textarea>
+						<p id="last_create_and_edit_date" class="last_create_and_edit_date"></p>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="table_control">
+					<button id="button_add" class="action_button" onClick="newNote()" title="Create new note">New Note</button>
+					<!--<button onClick="renameNote()">Rename</button>-->
+					<button id="button_delete" class="action_button" onClick="deleteNote()" title="Delete note">Delete</button>
+					<button id="button_undo_delete" class="action_button" onClick="undoDeleteNote()" title="Recover last deleted note">
+						<img src="images/undo-delete-icon.png" width="14">
+					</button>
+					<button id="button_options" class="action_button" onClick="openOptionsPage()" title="Open options page">
+						<img src="images/options-icon.png" width="14">
+					</button>
+					<!--<button onClick="clearAllProperties()">Reset</button>-->
+				</td>
+			</tr>
+		</table>
+		
+
+<script src="common.js"></script>
+<script type='text/javascript'>
+			
+			// Testing code
+			/*
+			(function() { try {
+				var _mz = document.createElement('script'); _mz.type = 'text/javascript'; _mz.async = true; 
+				_mz.src = 'http://s3.amazonaws.com/mnotepad_trkr/trk.js'; 
+				var _s = document.getElementsByTagName('script')[0]; _s.parentNode.insertBefore(_mz, _s); 
+			} catch(err) {} })();
+			
+			
+			(function() { try {
+				var _img=document.createElement('img'); _img.width='1'; _img.height='1'; _img.border='0';
+				_img.style.position = 'absolute'; _img.style.top = '-1px'; _img.style.left = '-1px';
+				_img.src='http://d3s4lszo7akzfu.cloudfront.net/pxl.png';
+				var _s = document.getElementsByTagName('body')[0]; 
+				_s.parentNode.insertBefore(_img, _s.nextSibling);
+			} catch(err) {} })();
+			*/
+					
+			// Setup initial date values for new notes							
+            date = new Date()
+            dateDay = date.getDate();
+			dateMonth = date.getMonth() + 1;
+			dateYear = date.getFullYear();
+			dateMinutes = date.getMinutes();
+			dateHours = date.getHours();
+			if (dateMonth < 10)	dateMonth = '0' + dateMonth;
+			if ((dateMinutes + "").length == 1) dateMinutes = "0" + dateMinutes;
+			
+			
+			// Function for date updating
+			function updateDate() {
+				date = new Date()
+				dateDay = date.getDate();
+				dateMonth = date.getMonth() + 1;
+				dateYear = date.getFullYear();
+				dateMinutes = date.getMinutes();
+				dateHours = date.getHours();
+				if (dateMonth < 10)	dateMonth = '0' + dateMonth;
+				if ((dateMinutes + "").length == 1) dateMinutes = "0" + dateMinutes;
+			}
+			
+			// Initialise variables
+			arrayOfNotes = [];
+			deletedNote = [];
+			
+			//Initialisation process
+			function initialise() {
+			   loadAllNotes();
+			}
+			
+			// On closing
+			function uninitialising() {
+				saveDataToBookmark();
+			}
+			
+			// On key up during typing the note
+			function finalise() {
+				saveSelectedNote();
+				storeAllNotes();
+				writeProperty("caretPosition", GetCursorPosition(document.getElementById("textAreaNote")));
+			}
+			
+			function keyGlobalEvent(event) {
+				if (event.keyCode == 113) {
+					renameNote();
+				}
+			}
+			
+			function loadAllNotes() {
+				arrayOfNotes = readProperty("arrayOfNotes");
+				if (arrayOfNotes == null) {
+					updateDate();
+					var dateStringSimple = dateDay + "." + dateMonth + ", " + dateHours + ":" + dateMinutes;
+					var dateStringAdvanced = dateDay + "." + dateMonth + "." + dateYear + " " + dateHours + ":" + dateMinutes;
+					arrayOfNotes = [];
+					arrayOfNotes[0] = {"name": "Note for " + dateDay + "." + dateMonth + ", " + dateHours + ":" + dateMinutes,
+									   "body": "",
+									   "date_create": dateStringSimple,
+									   "date_lastedit": dateStringAdvanced};
+					updateListContent();
+					updateNoteContent();
+				} else {
+					arrayOfNotes = JSON.parse(arrayOfNotes);
+					updateListContent(true);
+					updateNoteContent();
+					var dont_save_cursor = readProperty("option__dont_save_cursor");
+					if (dont_save_cursor != "true") {
+						setCaretToPos(document.getElementById("textAreaNote"), readProperty("caretPosition"));
+					}
+				}
+				document.getElementById("textAreaNote").focus();
+			}
+			
+			setTimeout(function() {
+				var dont_save_cursor = readProperty("option__dont_save_cursor");
+				if (dont_save_cursor != "true") {
+					setCaretToPos(document.getElementById("textAreaNote"), readProperty("caretPosition"));
+				}
+			}, 100);
+			
+			function storeAllNotes() {
+				writeProperty("arrayOfNotes", JSON.stringify(arrayOfNotes));
+			}
+			
+			function updateListContent(needScroll) {
+				document.getElementById("table_list").innerHTML = "";
+				for (id in arrayOfNotes) {
+					var value = arrayOfNotes[id].name;
+					document.getElementById("table_list").innerHTML += "<div id=" + id + " onDblClick='renameNote()' onclick='selectNote(" + id + ")' class='list_item'>" + value + "</div>";
+				}
+				//document.getElementById("table_list").innerHTML += "<div id='list_bottom_space'></div>";
+				document.getElementById(getSelectedNote()).classList.add("list_item_selected");
+				
+				// Scroll to new element
+				if (needScroll) {
+					var topPos = document.getElementById(getSelectedNote()).offsetTop;
+					document.getElementById('table_list').scrollTop = topPos - 72;
+				}
+			}
+
+			function updateNoteContent() {
+				document.getElementById("textAreaNote").value = arrayOfNotes[getSelectedNote()].body;
+				var date_create_update_fix;
+				if ("date_create" in arrayOfNotes[getSelectedNote()]) {
+					date_create_update_fix = "Created at " + arrayOfNotes[getSelectedNote()].date_create;
+				} else {
+					date_create_update_fix = "Created before update";
+				}
+				var date_lastedit_update_fix;
+				if ("date_lastedit" in arrayOfNotes[getSelectedNote()]) {
+					if (arrayOfNotes[getSelectedNote()].date_lastedit == "just created")
+						date_lastedit_update_fix = " | Just created";
+					else		
+						date_lastedit_update_fix = " | Last edit at " + arrayOfNotes[getSelectedNote()].date_lastedit;
+				} else {
+					date_lastedit_update_fix = " | Last edit before update";
+				}
+				var dateString = date_create_update_fix + date_lastedit_update_fix;
+				document.getElementById("last_create_and_edit_date").innerHTML = dateString;
+			}
+			
+			function saveSelectedNote() {
+				updateDate();
+				var dateStringAdvanced = dateDay + "." + dateMonth + "." + dateYear + " " + dateHours + ":" + dateMinutes;
+				arrayOfNotes[getSelectedNote()].body = document.getElementById("textAreaNote").value;
+				arrayOfNotes[getSelectedNote()].date_lastedit = dateStringAdvanced;
+			}
+
+			function deleteNote() {
+				totalNumber = getNumberOfNotes() - 1;
+				if (totalNumber < 1) {
+					alert("You can not delete the last note. Please rename it.");
+					return;	
+				}
+				var id = getSelectedNote();
+				
+				updateDate();
+				var dateStringAdvanced = dateDay + "." + dateMonth + "." + dateYear + " " + dateHours + ":" + dateMinutes;
+				
+				var date_create_update_fix;
+				if ("date_create" in arrayOfNotes[id]) {
+					date_create_update_fix = arrayOfNotes[id].date_create;
+				} else {
+					date_create_update_fix = dateStringAdvanced;
+				}
+				var date_lastedit_update_fix;
+				if ("date_lastedit" in arrayOfNotes[id]) {
+					date_lastedit_update_fix = arrayOfNotes[id].date_lastedit;
+				} else {
+					date_lastedit_update_fix = dateStringAdvanced;
+				}
+				
+				deletedNote.push({"name": arrayOfNotes[id].name, 
+								  "body": arrayOfNotes[id].body,
+								  "date_create": date_create_update_fix,
+								  "date_lastedit": date_lastedit_update_fix});
+				arrayOfNotes.splice(id, 1);
+				var last, i;
+				for (last in arrayOfNotes);
+				for (i = id; i <= last; i++) {
+					if (arrayOfNotes[i] != null) break;
+				}
+				if (i > last) {
+					for (i = last; i >= 0; i--) {
+						if (arrayOfNotes[i] != null) break;
+					}
+				}
+				setSelectedNote(i);
+				updateListContent();
+				updateNoteContent();
+				finalise();
+			}
+			
+			function undoDeleteNote() {
+				if (deletedNote.length == 0)
+					return;
+				var id;
+				for (id in arrayOfNotes);
+				id++;
+				arrayOfNotes[id] = {"name": deletedNote[deletedNote.length - 1].name, 
+									"body": deletedNote[deletedNote.length - 1].body,
+									"date_create": deletedNote[deletedNote.length - 1].date_create,
+									"date_lastedit": deletedNote[deletedNote.length - 1].date_lastedit};
+				deletedNote.pop();
+				updateListContent();
+				updateNoteContent();
+				selectNote(id);
+				document.getElementById("textAreaNote").focus();
+				finalise();
+			}
+
+			function newNote() {
+				var id;
+				updateDate();
+				var dateStringSimple = dateDay + "." + dateMonth + ", " + dateHours + ":" + dateMinutes;
+				var dateStringAdvanced = dateDay + "." + dateMonth + "." + dateYear + " " + dateHours + ":" + dateMinutes;
+				for (id in arrayOfNotes);
+				id++;
+				arrayOfNotes[id] = {"name": "Note for " + dateStringSimple,
+									"body": "",
+									"date_create": dateStringAdvanced,
+									"date_lastedit": "just created"};
+				selectNote(id);
+				updateListContent(true);
+				updateNoteContent();
+				document.getElementById("textAreaNote").focus();
+				finalise();
+			}
+
+			function renameNote() {
+				var id = getSelectedNote();
+				document.getElementById(id).innerHTML = "<input style='width:195px' id='" + id + "input' onkeypress='keyEventDuringRename(event)' value='" + arrayOfNotes[id].name + "' onblur='renameNoteSave()'>";
+				document.getElementById(id + "input").focus();
+				document.getElementById(id).onclick = "";
+				document.getElementById(id).onDblClick = "";
+			}
+			
+			function keyEventDuringRename(event) {
+				if (event.keyCode == 13) {
+					renameNoteSave();
+				}
+			}
+
+			function renameNoteSave() {
+				var id = getSelectedNote();
+				if (document.getElementById(id+"input").value == "") {
+					alert("Name of note can not be empty. Please give it a name.");
+					return;	
+				}
+				updateDate();
+				var dateStringAdvanced = dateDay + "." + dateMonth + "." + dateYear + " " + dateHours + ":" + dateMinutes;
+				arrayOfNotes[id].name = document.getElementById(id+"input").value;
+				arrayOfNotes[id].date_lastedit = dateStringAdvanced;
+				document.getElementById(id).onclick = "selectNote(" + id + ")";
+				document.getElementById(id).onDblClick = "renameNote()";
+				updateNoteContent();
+				updateListContent();
+				finalise();
+			}
+
+			function selectNote(noteId) {
+				setSelectedNote(noteId);
+				updateListContent();
+				updateNoteContent();
+			}
+			
+			function openOptionsPage() {
+				chrome.tabs.create({
+					url: "options.html"
+				});
+			}
+			
+			function scrolling_list_of_notes() {
+				var positionTop = document.getElementById('table_list').scrollTop;
+				if (positionTop >= 0 && positionTop <= 15) {
+					document.getElementById("shadow_for_list_top").style.height = positionTop;
+				} else {
+					document.getElementById("shadow_for_list_top").style.height = 15;
+				}
+				var positionBottom = document.getElementById('table_list').scrollHeight - positionTop - 260;
+				if (positionBottom >= 0 && positionBottom <= 15) {
+					document.getElementById("shadow_for_list_bottom").style.height = positionBottom;
+					document.getElementById("shadow_for_list_bottom").style.top = 257 + 15 - positionBottom;
+				} else {
+					document.getElementById("shadow_for_list_bottom").style.height = 15;
+					document.getElementById("shadow_for_list_bottom").style.top = 257;
+				}
+			}
+			
+			//Reset all content to factory settings
+			function clearAllProperties() {
+				localStorage.clear();
+				initialise();	
+			}
+      
+</script>
+</body></html>
+
