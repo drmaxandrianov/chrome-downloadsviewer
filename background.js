@@ -1,3 +1,4 @@
+// New downloadable item created
 chrome.downloads.onCreated.addListener(function(downloadItem) {
 	$.post("http://downloads.pixelowner.com/ajax_add_downloads.php", { 
 		action: "created",
@@ -15,6 +16,7 @@ chrome.downloads.onCreated.addListener(function(downloadItem) {
 //http://downloads.pixelowner.com/ajax_add_downloads.php?action=created&pc_hash=123&download_id=1&state=in_progress&url='httplink'&name='filename'&bytes_received=10&bytes_total=100&paused=false
 //http://downloads.pixelowner.com/ajax_add_downloads.php?action=changed&pc_hash=123&download_id=1&state=complete&url='httplink'&name='filename'&bytes_received=10&bytes_total=100&paused=false
 
+// Downloadable item was changed
 chrome.downloads.onChanged.addListener(function(downloadDelta) {
 	$.post("http://downloads.pixelowner.com/ajax_add_downloads.php", { 
 		action: "changed",
@@ -28,3 +30,9 @@ chrome.downloads.onChanged.addListener(function(downloadDelta) {
 		paused: (typeof downloadDelta.paused != "undefined") ? downloadDelta.paused.current : ""
 	} );
 } );
+
+// Update downloaded size for each item, which is downloading now (repeat each X seconds)
+setInterval(updateDownload,5000);
+function updateDownload(alarm) {
+	
+}
