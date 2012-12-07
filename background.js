@@ -1,25 +1,30 @@
 chrome.downloads.onCreated.addListener(function(downloadItem) {
 	$.post("http://downloads.pixelowner.com/ajax_add_downloads.php", { 
+		action: "created",
+		pc_hash: localStorage.pc_hash,
 		download_id: downloadItem.id,  
-		is_start: "true",  
-		is_end: "false",  
-		is_canceled: "false",  
+		state: downloadItem.state, // "in_progress", "interrupted", "complete"
 		url: downloadItem.url,  
-		name: downloadItem.url.substring(downloadItem.url.lastIndexOf("/")),  
-		pc_hash: localStorage.pc_hash,  
-		progress: 0 
+		name: downloadItem.filename, //downloadItem.url.substring(downloadItem.url.lastIndexOf("/") + 1),  
+		bytes_received: downloadItem.bytesReceived, 
+		bytes_total: downloadItem.totalBytes,
+		paused: downloadItem.paused
 	} );
 });
 
+//http://downloads.pixelowner.com/ajax_add_downloads.php?action=created&pc_hash=123&download_id=1&state=in_progress&url='httplink'&name='filename'&bytes_received=10&bytes_total=100&paused=false
+//http://downloads.pixelowner.com/ajax_add_downloads.php?action=changed&pc_hash=123&download_id=1&state=complete&url='httplink'&name='filename'&bytes_received=10&bytes_total=100&paused=false
+
 chrome.downloads.onChanged.addListener(function(downloadDelta) {
 	$.post("http://downloads.pixelowner.com/ajax_add_downloads.php", { 
-		download_id: downloadDelta.id,  
-		is_start: "false",  
-		is_end: "false",  
-		is_canceled: "false",  
-		url: "",
-		name: "",
+		action: "changed",
 		pc_hash: localStorage.pc_hash,  
-		progress: downloadDelta.totalBytes 
+		download_id: downloadDelta.id,  
+		state: (typeof downloadDelta.state != "undefined") ? downloadDelta.state.current : "", // "in_progress", "interrupted", "complete"
+		url: (typeof downloadDelta.url != "undefined") ? downloadDelta.url.current : "",
+		name: (typeof downloadDelta.filename != "undefined") ? downloadDelta.filename.current : "",
+		bytes_received: "", 
+		bytes_total: (typeof downloadDelta.totalBytes != "undefined") ? downloadDelta.totalBytes.current : "",
+		paused: (typeof downloadDelta.paused != "undefined") ? downloadDelta.paused.current : ""
 	} );
 } );
