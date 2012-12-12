@@ -5,14 +5,23 @@ $('document').ready(function() {
 			.success(function(data) { 
 				localStorage.pc_hash = data;
 				$("#pc_hash").html("Your personal PC hash is " + localStorage.pc_hash);
+				$('#qrcode').qrcode({width: 300,height: 300,text: "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash});
+				$('#visit_button').attr("href", "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash);
 			})
 			.error(function() { 
-				$("#pc_hash").html("Can not connect to server. " +
+				$("#qrcode").html("Can not connect to server. " +
 									"Try to reopen this extension (click on icon above)." +
 									"If problem repeats then check Internet connection");
 			});
 	} else {
 		$("#pc_hash").html("Your personal PC hash is " + localStorage.pc_hash);
+		$('#qrcode').qrcode({width: 300,height: 300,text: "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash});
+		$('#visit_button').attr("href", "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash);
 	}
-	$('#qrcode').qrcode({width: 300,height: 300,text: "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash});
+	
+	// Make button clickable
+	$('#visit_button').click(function(){
+		chrome.tabs.create({url: $(this).attr('href')});
+		return false;
+	});
 });

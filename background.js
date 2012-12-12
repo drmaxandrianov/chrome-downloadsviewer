@@ -32,7 +32,24 @@ chrome.downloads.onChanged.addListener(function(downloadDelta) {
 } );
 
 // Update downloaded size for each item, which is downloading now (repeat each X seconds)
-setInterval(updateDownload,5000);
-function updateDownload(alarm) {
-	
+setInterval(updateDownload, 5000);
+function updateDownload() {
+	chrome.downloads.search({state: "in_progress"}, function(items) {
+		for (ind in items) {
+			if (items[ind].state != "in_progress") continue;
+			console.log(items[ind].totalBytes);
+			$.post("http://downloads.pixelowner.com/ajax_add_downloads.php", { 
+				action: "changed",
+				pc_hash: localStorage.pc_hash,  
+				download_id: items[ind].id,  
+				state: items[ind].state, // "in_progress", "interrupted", "complete"
+				url: "",
+				name: items[ind].filename,
+				bytes_received: items[ind].bytesReceived, 
+				bytes_total: items[ind].totalBytes,
+				paused: ""
+			} );
+		}
+	});	
 }
+
