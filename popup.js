@@ -14,5 +14,5 @@ $('document').ready(function() {
 	} else {
 		$("#pc_hash").html("Your personal PC hash is " + localStorage.pc_hash);
 	}
-	$('#qrcode').qrcode({width: 300,height: 300,text: "size doesn't matter"});
+	$('#qrcode').qrcode({width: 300,height: 300,text: "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash});
 });
