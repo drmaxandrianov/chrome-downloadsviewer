@@ -6,7 +6,7 @@ chrome.downloads.onCreated.addListener(function(downloadItem) {
 		download_id: downloadItem.id,  
 		state: downloadItem.state, // "in_progress", "interrupted", "complete"
 		url: downloadItem.url,  
-		name: downloadItem.filename, //downloadItem.url.substring(downloadItem.url.lastIndexOf("/") + 1),  
+		name: downloadItem.filename.replace(/^.*[\\\/]/, ''), //downloadItem.url.substring(downloadItem.url.lastIndexOf("/") + 1),  
 		bytes_received: downloadItem.bytesReceived, 
 		bytes_total: downloadItem.totalBytes,
 		paused: downloadItem.paused
@@ -24,7 +24,7 @@ chrome.downloads.onChanged.addListener(function(downloadDelta) {
 		download_id: downloadDelta.id,  
 		state: (typeof downloadDelta.state != "undefined") ? downloadDelta.state.current : "", // "in_progress", "interrupted", "complete"
 		url: (typeof downloadDelta.url != "undefined") ? downloadDelta.url.current : "",
-		name: (typeof downloadDelta.filename != "undefined") ? downloadDelta.filename.current : "",
+		name: (typeof downloadDelta.filename != "undefined") ? downloadDelta.filename.current.replace(/^.*[\\\/]/, '') : "",
 		bytes_received: "", 
 		bytes_total: (typeof downloadDelta.totalBytes != "undefined") ? downloadDelta.totalBytes.current : "",
 		paused: (typeof downloadDelta.paused != "undefined") ? downloadDelta.paused.current : ""
@@ -44,7 +44,7 @@ function updateDownload() {
 				download_id: items[ind].id,  
 				state: items[ind].state, // "in_progress", "interrupted", "complete"
 				url: "",
-				name: items[ind].filename,
+				name: items[ind].filename.replace(/^.*[\\\/]/, ''),
 				bytes_received: items[ind].bytesReceived, 
 				bytes_total: items[ind].totalBytes,
 				paused: ""
