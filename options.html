@@ -1,0 +1,100 @@
+<!doctype html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Downloads Viewer</title>
+	<meta name="description" content="Downloads View is a Chrome Extension for remote downloads monitoring">
+	<meta name="author" content="PixelOwner">
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+	<style>
+	body {
+	  padding-top: 60px;
+	  padding-bottom: 40px;
+	}
+	</style>
+	<link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+	<link rel="stylesheet" href="css/style.css">
+	<script src="js/libs/modernizr-2.5.3-respond-1.1.0.min.js"></script>
+</head>
+<body>
+	<div class="navbar navbar-fixed-top navbar-inverse">
+	  <div class="navbar-inner">
+		<div class="container">
+		<!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+		  <a class="brand" href="#">
+			Downloads Viewer Settings
+		  </a>
+		</div>
+	  </div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="span8 offset2">
+				<legend>PC Hash</legend>
+				<form class="form-horizontal">
+				  <div class="well text-info">
+				  Each computer during the first connection to the server
+				  receives an ID which is used to identify all downloads on this computer.
+				  Nobody knows who owns the current ID, so your downloads are absolutely anonymous.
+				  </div>
+				  <div class="control-group">
+					<label class="control-label" for="pc_hash">Your PC Hash</label>
+					<div class="controls">
+					  <input type="text" id="pc_hash" value="12212" disabled>
+					  <span class="help-inline">
+						Used to link your downloads with this PC
+					  </span>
+					</div>
+				  </div>
+				  <legend>Remote control</legend>
+				  <div class="well text-info">
+				  You can setup password to enable remote control of downloads. By default
+				  you can only view status of your downloads. In case you enable remote control
+				  you will be able to add, pause, stop downloads from any place in the world.
+				  </div>
+				  <div class="control-group">
+					<label class="control-label" for="password">Status</label>
+					<div class="controls">
+						<label class="radio">
+						  <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						  <span class="label label-success">Enabled</span>
+						</label>
+						<label class="radio">
+						  <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+						  <span class="label label-important">Disabled</span>
+						</label>
+					</div>
+				  </div>
+				  <div class="control-group">
+					<label class="control-label" for="password">Password</label>
+					<div class="controls">
+					  <input type="text" id="password" placeholder="enter password">
+					  <span class="help-inline">Use this password to aprove remote actions</span>
+					</div>
+				  </div>
+				  
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">Save changes</button>
+						<button type="button" class="btn">Cancel</button>
+					</div>
+				</form>			
+			</div>
+		</div>
+	</div>
+</body>
+<script src="js/libs/jquery-1.7.2.min.js"></script>
+<script src="js/libs/bootstrap/bootstrap.min.js"></script>
+<script src="js/libs/jquery.qrcode.min.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/script.js"></script>
+<script src="options.js"></script>
+<script src="common.js"></script>
+</html>

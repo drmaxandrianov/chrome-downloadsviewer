@@ -18,6 +18,7 @@
 		"default_icon": "img/icon-32.png",
 		"default_popup": "popup.html"
 	},
+	"options_page": "options.html",
 	"background": {
 		"page": "background.html"
 	},
