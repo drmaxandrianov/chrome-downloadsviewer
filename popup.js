@@ -25,3 +25,7 @@ $('document').ready(function() {
 		return false;
 	});
 });
+
+$('#options_link').click(function() {
+	chrome.tabs.create({url: 'options.html'});
+});
