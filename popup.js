@@ -3,7 +3,11 @@ $('document').ready(function() {
 		$("#pc_hash").html("Retrieving personal PC hash...");
 		$.get("http://downloads.pixelowner.com/ajax_add_computer.php")
 			.success(function(data) { 
+				// Setup settings
+				localStorage.syncEnabled = false;
 				localStorage.pc_hash = data;
+				
+				// Continue othe things
 				$("#pc_hash").html("Your personal PC hash is " + localStorage.pc_hash);
 				$('#qrcode').qrcode({width: 300,height: 300,text: "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash});
 				$('#visit_button').attr("href", "http://downloads.pixelowner.com/index.php?pc_hash=" + localStorage.pc_hash);

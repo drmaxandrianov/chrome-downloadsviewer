@@ -23,7 +23,6 @@
 	<div class="navbar navbar-fixed-top navbar-inverse">
 	  <div class="navbar-inner">
 		<div class="container">
-		<!-- .btn-navbar is used as the toggle for collapsed navbar content -->
       <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -48,7 +47,7 @@
 				  <div class="control-group">
 					<label class="control-label" for="pc_hash">Your PC Hash</label>
 					<div class="controls">
-					  <input type="text" id="pc_hash" value="12212" disabled>
+					  <input type="text" id="pc_hash" value="not set, click extension button" disabled>
 					  <span class="help-inline">
 						Used to link your downloads with this PC
 					  </span>
@@ -58,8 +57,8 @@
 					<label class="control-label" for="link_to_page">Link to page</label>
 					<div class="controls">
 					<div class="input-append">
-					  <input type="text" id="link_to_page" value="http://www.ru" disabled>
-					  <a class="btn" type="button" href="http://www.ru">Visit</a>
+					  <input type="text" id="link_to_page" value="not set, click extension button" disabled>
+					  <a id="link_to_page_button" class="btn" type="button" href="http://www.ru">Visit</a>
 					</div>
 					  
 					  <span class="help-inline">
@@ -81,7 +80,7 @@
 						  <span class="label label-success">Enabled</span>
 						</label>
 						<label class="radio">
-						  <input type="radio" name="syncStatus" id="syncDisable" value="disabled" checked>
+						  <input type="radio" name="syncStatus" id="syncDisable" value="disabled">
 						  <span class="label label-important">Disabled</span>
 						</label>
 					</div>
@@ -89,18 +88,31 @@
 				  <div class="control-group">
 					<label class="control-label" for="password">Password</label>
 					<div class="controls">
-					  <input type="text" id="password" placeholder="enter password">
+					  <input type="password" id="password" placeholder="enter password">
 					  <span class="help-inline">Use this password to aprove remote actions</span>
 					</div>
 				  </div>
 				  
 					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">Save changes</button>
+						<button id="save_button" type="button" class="btn btn-primary">Save changes</button>
 						<button type="button" class="btn">Cancel</button>
 					</div>
 				</form>			
 			</div>
 		</div>
+	</div>
+	
+	<!-- Model window which will be shown in case there are no PC Hash for current user -->
+	<div id="firstOpenModel" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false"
+	data-backdrop="static">
+	  <div class="modal-header">
+		<h3 id="myModalLabel">This is the first run</h3>
+	  </div>
+	  <div class="modal-body">
+		<p>Hello dear user! There are no options for now. First of all launch the extension using the button
+		on the top panel. Extension will receive all important information from a remote server.
+		After that you can visit this page again. Thank you!</p>
+	  </div>
 	</div>
 </body>
 <script src="js/libs/jquery-1.7.2.min.js"></script>
