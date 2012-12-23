@@ -17,6 +17,8 @@ $('document').ready(function() {
 			$('#password').attr('disabled', 'disabled');
 		}
 		
+		$('#password').val(localStorage.syncPassword);
+		
 	} else {
 		$('#firstOpenModel').modal();
 	}
@@ -27,12 +29,31 @@ $('document').ready(function() {
 // -------------
 
 $('#save_button').click(function() {
-	localStorage.syncEnabled = $('#syncEnable').attr('checked') == "checked";
-	showSaveStatus(status);
+	var status = true;
+	var messageInError = "";
+	var syncStatus = $('#syncEnable').prop('checked');
+	var syncPassword = $('#password').val();
+	if (syncStatus) {
+		if (syncPassword == "") { 
+			status = false;
+			messageInError = "Password can not be empty for syncing. Please, set it up.";
+		} else {
+			localStorage.syncEnabled = syncStatus;
+			localStorage.syncPassword = syncPassword;
+		}
+	} else {
+		localStorage.syncEnabled = syncStatus;
+		localStorage.syncPassword = syncPassword;
+	}
+	showSaveStatus(status, messageInError);
 });
 
-function showSaveStatus(status) {
-
+function showSaveStatus(success, messageInError) {
+	if (success) {
+		$('#save_status').html('<span class="label label-success">Successfully saved!</span>');
+	} else {
+		$('#save_status').html('<span class="label label-important">' + messageInError + '</span>');
+	}
 }
 
 

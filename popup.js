@@ -28,6 +28,11 @@ $('document').ready(function() {
 		chrome.tabs.create({url: $(this).attr('href')});
 		return false;
 	});
+	
+	// Remove sync promotion block in case it is on
+	if (localStorage.syncEnabled == "true") {
+		$('#suggest_sync').hide();
+	}
 });
 
 $('#options_link').click(function() {
